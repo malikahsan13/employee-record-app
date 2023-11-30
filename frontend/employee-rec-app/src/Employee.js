@@ -65,6 +65,69 @@ const Employee = () => {
     setShowModal(false);
   };
 
+  const addEmployee = async () => {
+    fetch(variables.API_URL + "employee", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: modalData.emp_name,
+        dept_id: modalData.emp_dept_id,
+        date_of_joining: modalData.emp_date_of_joining,
+        profile_photo: "",
+      }),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        alert(result);
+        fetchAllEmployees();
+        closeModal();
+      })
+      .catch((err) => alert(err));
+  };
+
+  const updateEmployee = async () => {
+    fetch(variables.API_URL + "employee", {
+      method: "PUT",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: modalData.emp_id,
+        name: modalData.emp_name,
+        dept_id: modalData.emp_dept_id,
+        date_of_joining: modalData.emp_date_of_joining,
+        profile_photo: "",
+      }),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        alert(result);
+        fetchAllEmployees();
+        closeModal();
+      })
+      .catch((err) => alert(err));
+  };
+
+  const deleteEmp = async (emp_id) => {
+    fetch(variables.API_URL + "employee/" + emp_id, {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        alert(result);
+        fetchAllEmployees();
+      })
+      .catch((err) => alert(err));
+  };
+
   return (
     <>
       <button
@@ -100,9 +163,21 @@ const Employee = () => {
                       className="bi bi-pencil-square"
                       onClick={() => {
                         openModal(true);
+                        setModalData({
+                          ...modalData,
+                          emp_id: emp.id,
+                          emp_name: emp.name,
+                          emp_dept_id: emp.dept_id,
+                          emp_date_of_joining: emp.date_of_joining,
+                        });
                       }}
                     ></i>
-                    <i className="bi bi-trash"></i>
+                    <i
+                      className="bi bi-trash"
+                      onClick={() => {
+                        deleteEmp(emp.id);
+                      }}
+                    ></i>
                   </td>
                 </tr>
               );
@@ -145,15 +220,36 @@ const Employee = () => {
                         className="form-control"
                         id="employeeName"
                         placeholder="Enter Employee Name"
+                        onChange={(e) => {
+                          setModalData({
+                            ...modalData,
+                            emp_name: e.target.value,
+                          });
+                        }}
+                        value={modalData.emp_name}
                       />
                     </div>
                     <div className="form-group">
                       <label htmlFor="employeeName">Employee Department</label>
-                      <select className="form-control" id="employeeDepartment">
+                      <select
+                        className="form-control"
+                        id="employeeDepartment"
+                        value={modalData.emp_dept_id || ""}
+                        onChange={(e) => {
+                          setModalData({
+                            ...modalData,
+                            emp_dept_id: e.target.value,
+                          });
+                        }}
+                      >
                         {departments &&
                           departments.map((dept) => {
                             return (
-                              <option key={dept.id} id={dept.id}>
+                              <option
+                                key={dept.id}
+                                // value={dept.id}
+                                value={dept.id}
+                              >
                                 {dept.name}
                               </option>
                             );
@@ -169,12 +265,25 @@ const Employee = () => {
                         className="form-control"
                         id="employeeDateofJoining"
                         placeholder="Enter Employee Joining Date"
+                        onChange={(e) => {
+                          setModalData({
+                            ...modalData,
+                            emp_date_of_joining: e.target.value,
+                          });
+                        }}
+                        value={
+                          modalData.emp_date_of_joining
+                            ? new Date(modalData.emp_date_of_joining)
+                                .toISOString()
+                                .split("T")[0]
+                            : ""
+                        }
                       />
                     </div>
                   </div>
                   <div className="col-lg-4">
                     <img
-                      src="../../../Photos/github.png"
+                      // src="../../Photos/github.png"
                       className="rounded float-right"
                       alt="..."
                     />
@@ -189,7 +298,17 @@ const Employee = () => {
                 >
                   Close
                 </button>
-                <button type="button" className="btn btn-primary">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => {
+                    if (modalData.emp_id > 0) {
+                      updateEmployee();
+                    } else {
+                      addEmployee();
+                    }
+                  }}
+                >
                   Save changes
                 </button>
               </div>

@@ -100,7 +100,7 @@ app.put("/api/employee", (req, res) => {
     req.body["dept_id"],
     req.body["date_of_joining"],
     req.body["profile_photo"],
-    [req.body["id"]],
+    req.body["id"],
   ];
   connection.query(query, values, function (err, rows, fields) {
     if (err) res.send("Error updating Department");

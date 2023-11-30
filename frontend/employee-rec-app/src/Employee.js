@@ -11,6 +11,7 @@ const Employee = () => {
     emp_name: "",
     emp_dept_id: 0,
     emp_date_of_joining: "",
+    emp_profile_pic: "github.png",
   });
 
   const fetchAllEmployees = async () => {
@@ -52,7 +53,7 @@ const Employee = () => {
     fetchAllDepartment();
   }, []);
 
-  const openModal = (isUpdate) => {
+  const openModal = (isUpdate = false) => {
     if (isUpdate) {
       setModalData({ ...modalData, modal_title: "Update Employee" });
     } else {
@@ -76,7 +77,7 @@ const Employee = () => {
         name: modalData.emp_name,
         dept_id: modalData.emp_dept_id,
         date_of_joining: modalData.emp_date_of_joining,
-        profile_photo: "",
+        profile_photo: modalData.emp_profile_pic,
       }),
     })
       .then((res) => res.json())
@@ -100,7 +101,7 @@ const Employee = () => {
         name: modalData.emp_name,
         dept_id: modalData.emp_dept_id,
         date_of_joining: modalData.emp_date_of_joining,
-        profile_photo: "",
+        profile_photo: modalData.emp_profile_pic,
       }),
     })
       .then((res) => res.json())
@@ -126,6 +127,24 @@ const Employee = () => {
         fetchAllEmployees();
       })
       .catch((err) => alert(err));
+  };
+
+  const uploadProfilePic = async (e) => {
+    e.preventDefault();
+
+    let formData = new FormData();
+    formData.append("file", e.target.files[0], e.target.files[0].name);
+
+    fetch(variables.PHOTO_URL, {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        setModalData({ ...modalData, emp_profile_pic: result });
+        //console.log(result);
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -169,6 +188,7 @@ const Employee = () => {
                           emp_name: emp.name,
                           emp_dept_id: emp.dept_id,
                           emp_date_of_joining: emp.date_of_joining,
+                          emp_profile_pic: emp.profile_photo,
                         });
                       }}
                     ></i>
@@ -187,7 +207,7 @@ const Employee = () => {
 
       {showModal && (
         <div
-          className="modal fade show"
+          className="modal fade show modal-lg"
           id="employeeModal"
           tabIndex="-1"
           role="dialog"
@@ -282,11 +302,29 @@ const Employee = () => {
                     </div>
                   </div>
                   <div className="col-lg-4">
-                    <img
-                      // src="../../Photos/github.png"
-                      className="rounded float-right"
-                      alt="..."
-                    />
+                    <div>
+                      <img
+                        width="250px"
+                        height="200px"
+                        src={
+                          variables.IMG_URL + "/" + modalData.emp_profile_pic
+                        }
+                        className="rounded float-right"
+                        alt="Profile Picture"
+                      />
+                    </div>
+                    <div>
+                      <div className="custom-file">
+                        <input
+                          type="file"
+                          className="custom-file-input"
+                          id="profile_pic"
+                          onChange={(e) => {
+                            uploadProfilePic(e);
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

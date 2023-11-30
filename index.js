@@ -7,9 +7,15 @@ const fs = require("fs");
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
+app.use(bodyParser.json({ limit: "200mb" }));
+app.use(bodyParser.urlencoded({ limit: "200mb", extended: true }));
+app.use(
+  cors({
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
+);
 app.use(fileupload());
 app.use("/Photos", express.static(__dirname + "/Photos"));
 
@@ -125,5 +131,5 @@ app.post("/api/employee/savefile", (req, res) => {
       if (err) return console.log(`Error uploading file ${err}`);
     }
   );
-  res.send("File uploaded successfully");
+  res.json(req.files.file.name);
 });

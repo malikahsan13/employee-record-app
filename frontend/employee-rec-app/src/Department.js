@@ -3,7 +3,6 @@ import { variables } from "./Variables";
 
 const Department = () => {
   const [departments, setDepartments] = useState([]);
-  const [filteredDepartments, setFilteredDepartments] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState({
     modal_title: "",
@@ -13,7 +12,8 @@ const Department = () => {
   const [filterData, setFilterData] = useState({
     DepartmentIdFilter: "",
     DepartmentNameFilter: "",
-    DepartmentWithoutFilter: "",
+    sortBy: "id",
+    sortOrder: "ASC",
   });
 
   function ApplyFilter() {
@@ -38,7 +38,15 @@ const Department = () => {
           )
       );
     }
-    return FilterData;
+    return FilterData.sort((a, b) => {
+      a = a[filterData.sortBy];
+      b = b[filterData.sortBy];
+      return filterData.sortOrder === "ASC"
+        ? a - b
+        : filterData.sortOrder === "DESC"
+        ? b - a
+        : 0;
+    });
     //setFilteredDepartments(FilterData);
   }
 
@@ -63,7 +71,6 @@ const Department = () => {
     if (res.ok) {
       let resBody = await res.json();
       setDepartments(resBody);
-      setFilteredDepartments(resBody);
     }
   };
 
@@ -172,6 +179,29 @@ const Department = () => {
                   })
                 }
               />
+              {filterData.sortOrder === "DESC" ? (
+                <i
+                  className="bi bi-sort-alpha-down"
+                  onClick={(e) =>
+                    setFilterData({
+                      ...filterData,
+                      sortOrder: "ASC",
+                      sortBy: "id",
+                    })
+                  }
+                ></i>
+              ) : (
+                <i
+                  className="bi bi-sort-alpha-up"
+                  onClick={(e) =>
+                    setFilterData({
+                      ...filterData,
+                      sortOrder: "DESC",
+                      sortBy: "id",
+                    })
+                  }
+                ></i>
+              )}
               Department ID
             </th>
             <th scope="col">
@@ -188,6 +218,29 @@ const Department = () => {
                   })
                 }
               />
+              {filterData.sortOrder === "DESC" ? (
+                <i
+                  className="bi bi-sort-alpha-down"
+                  onClick={(e) =>
+                    setFilterData({
+                      ...filterData,
+                      sortOrder: "ASC",
+                      sortBy: "name",
+                    })
+                  }
+                ></i>
+              ) : (
+                <i
+                  className="bi bi-sort-alpha-up"
+                  onClick={(e) =>
+                    setFilterData({
+                      ...filterData,
+                      sortOrder: "DESC",
+                      sortBy: "name",
+                    })
+                  }
+                ></i>
+              )}
               Department Name
             </th>
             <th>Actions</th>

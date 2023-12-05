@@ -310,7 +310,7 @@ const Employee = () => {
                           variables.IMG_URL + "/" + modalData.emp_profile_pic
                         }
                         className="rounded float-right"
-                        alt="Profile Picture"
+                        alt="Profile"
                       />
                     </div>
                     <div>

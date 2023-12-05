@@ -3,12 +3,58 @@ import { variables } from "./Variables";
 
 const Department = () => {
   const [departments, setDepartments] = useState([]);
+  const [filteredDepartments, setFilteredDepartments] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState({
     modal_title: "",
     department_id: 0,
     department_name: "",
   });
+  const [filterData, setFilterData] = useState({
+    DepartmentIdFilter: "",
+    DepartmentNameFilter: "",
+    DepartmentWithoutFilter: "",
+  });
+
+  function ApplyFilter() {
+    let FilterData = departments;
+
+    if (filterData.DepartmentIdFilter) {
+      FilterData = departments.filter((dept) =>
+        dept.id
+          .toString()
+          .trim()
+          .includes(filterData.DepartmentIdFilter.toString().trim())
+      );
+    }
+    if (filterData.DepartmentNameFilter) {
+      FilterData = departments.filter((dept) =>
+        dept.name
+          .toString()
+          .toLowerCase()
+          .trim()
+          .includes(
+            filterData.DepartmentNameFilter.toString().toLowerCase().trim()
+          )
+      );
+    }
+    return FilterData;
+    //setFilteredDepartments(FilterData);
+  }
+
+  // function changeDepartmentIdFilter(e) {
+  //   if (filterData.DepartmentIdFilter) {
+  //     setFilterData({ ...filterData, DepartmentIdFilter: e.target.value });
+  //   }
+  //   FilterFtn();
+  // }
+
+  // function changeDepartmentNameFilter(e) {
+  //   if (filterData.DepartmentNameFilter) {
+  //     setFilterData({ ...filterData, DepartmentNameFilter: e.target.value });
+  //   }
+  //   FilterFtn();
+  // }
 
   const fetchAllDepartment = async () => {
     let res = await fetch(variables.API_URL + "department", {
@@ -17,6 +63,7 @@ const Department = () => {
     if (res.ok) {
       let resBody = await res.json();
       setDepartments(resBody);
+      setFilteredDepartments(resBody);
     }
   };
 
@@ -100,7 +147,7 @@ const Department = () => {
     <>
       <button
         type="button"
-        className="btn btn-primary"
+        className="btn btn-primary float-end"
         onClick={() => {
           openModal();
         }}
@@ -111,13 +158,43 @@ const Department = () => {
       <table className="table table-stripped">
         <thead>
           <tr>
-            <th scope="col">Department ID</th>
-            <th scope="col">Department Name</th>
+            <th scope="col">
+              <input
+                type="text"
+                value={filterData.DepartmentIdFilter}
+                className="form-control m-2"
+                placeholder="Department ID"
+                //onChange={(e) => changeDepartmentIdFilter(e)}
+                onChange={(e) =>
+                  setFilterData({
+                    ...filterData,
+                    DepartmentIdFilter: e.target.value,
+                  })
+                }
+              />
+              Department ID
+            </th>
+            <th scope="col">
+              <input
+                type="text"
+                value={filterData.DepartmentNameFilter}
+                className="form-control m-2"
+                placeholder="Department Name"
+                // onChange={(e) => changeDepartmentNameFilter(e)}
+                onChange={(e) =>
+                  setFilterData({
+                    ...filterData,
+                    DepartmentNameFilter: e.target.value,
+                  })
+                }
+              />
+              Department Name
+            </th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {departments.map((dept) => {
+          {ApplyFilter().map((dept) => {
             return (
               <tr key={dept.id}>
                 <td>{dept.id}</td>
